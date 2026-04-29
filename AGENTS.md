@@ -158,3 +158,23 @@ describe("Component", () => {
 ## Known Issues
 
 - **Avoid using `pnpm dev` to achieve goals**: The development server is designed to run continuously and does not exit automatically. Tasks that rely on file generation (e.g., updating TanStack file-based routing tree, generating types) will hang indefinitely when run through `pnpm dev`. Use build commands or direct scripts instead.
+
+## Project Context
+
+### ID 设计
+- **chain.id**: 内部 UUID（如 `c2cca98c-d46a-45d3-a382-bae720e7d54f`）
+- **shareKey**: 用户友好的分享码（如 `AAHK-PNF4-99AD-S2HS`）
+- URL 使用 shareKey，数据库关联使用 id
+
+### 会话管理
+- 每个讨论串独立的 sessionId，存储在 localStorage 的 `quickleap_sessions` 对象中
+- client.ts 中的 `getSessionId(chainId)` 和 `setSessionId(chainId, id)` 管理会话
+
+### API 端点
+- `/api/chains/$chainId/` - 通过内部 ID 获取讨论串数据
+- `/api/chains/$shareKey/` - 通过分享码获取讨论串数据
+- 投票相关接口需要 `x-session-id` 头
+
+### 投票逻辑
+- `castVote` 同时检查 session_id + chain_id 来判断是否更新现有投票
+- GET 接口返回 `hasVoted`、`userVote`、`userReason` 用于刷新恢复投票状态
