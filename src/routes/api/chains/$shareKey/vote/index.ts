@@ -34,7 +34,7 @@ export const Route = createFileRoute("/api/chains/$shareKey/vote/")({
 
           // 每次投票都加入讨论串（为当前讨论串创建新参与者）
           try {
-            const joinResult = await joinChain(chainResult.chain.id, undefined, ipAddress ?? "", sessionId);
+            await joinChain(chainResult.chain.id, undefined, ipAddress ?? "", sessionId);
           } catch (e) {
             console.error("[API castVote] joinChain error:", e);
           }

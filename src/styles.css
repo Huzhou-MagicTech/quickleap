@@ -7,6 +7,42 @@
     dark --dark;
 }
 
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  prefersdark: false;
+  color-scheme: "light";
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(98% 0 0);
+  --color-base-300: oklch(95% 0 0);
+  --color-base-content: oklch(21% 0.006 285.885);
+  --color-secondary: oklch(59% 0.145 163.225);
+  --color-secondary-content: oklch(100% 0 0);
+  --color-accent: #8b5cf6;
+  --color-accent-content: oklch(100% 0 0);
+  --color-neutral: #9ca3af;
+  --color-neutral-content: oklch(0% 0 0);
+  --color-info: oklch(74% 0.16 232.661);
+  --color-info-content: oklch(29% 0.066 243.157);
+  --color-warning: oklch(82% 0.189 84.429);
+  --color-warning-content: oklch(41% 0.112 45.904);
+  --color-error: oklch(71% 0.194 13.428);
+  --color-error-content: oklch(27% 0.105 12.094);
+  --radius-selector: 2rem;
+  --radius-field: 1rem;
+  --radius-box: 0.5rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 0;
+  --noise: 0;
+  /* Sea Glass palette override — QuickLeap design system */
+  --color-primary: oklch(72% 0.14 178);
+  --color-primary-content: oklch(100% 0 0);
+  --color-success: oklch(72% 0.14 178);
+  --color-success-content: oklch(100% 0 0);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -15,4 +51,41 @@ html,
 body,
 #app {
   min-height: 100%;
+}
+
+/* Fraunces for card titles and headlines */
+.card-title,
+h2,
+h3 {
+  font-family: Fraunces, Georgia, serif;
+  font-weight: 500;
+}
+
+/* Fix selection color to match Sea Glass teal */
+::selection {
+  background: rgba(79, 184, 178, 0.24);
+}
+
+/* Text overflow protection */
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Long text wrapping */
+.wrap-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Prevent flex/grid children from overflowing */
+.flex-overflow-fix > * {
+  min-width: 0;
+}
+
+/* Card body text protection */
+.card-body p {
+  overflow-wrap: break-word;
 }

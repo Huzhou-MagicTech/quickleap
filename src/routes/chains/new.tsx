@@ -81,6 +81,11 @@ function RouteComponent() {
                   setTitle(e.target.value);
                   if (titleError) setTitleError(false);
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !isLoading && title.trim()) {
+                    handleSubmit(e as any);
+                  }
+                }}
                 disabled={isLoading}
                 maxLength={200}
               />
@@ -109,7 +114,7 @@ function RouteComponent() {
                   <label className="label cursor-pointer justify-start gap-3">
                     <input
                       type="checkbox"
-                      className="checkbox checkbox-primary"
+                      className="checkbox checkbox-accent"
                       checked={useCustomOptions}
                       onChange={(e) => setUseCustomOptions(e.target.checked)}
                       disabled={isLoading}
@@ -155,7 +160,7 @@ function RouteComponent() {
                   <label className="label cursor-pointer justify-start gap-3">
                     <input
                       type="checkbox"
-                      className="checkbox checkbox-secondary"
+                      className="checkbox checkbox-accent"
                       checked={reasonRequired}
                       onChange={(e) => setReasonRequired(e.target.checked)}
                       disabled={isLoading}
@@ -168,7 +173,7 @@ function RouteComponent() {
                   <label className="label cursor-pointer justify-start gap-3">
                     <input
                       type="checkbox"
-                      className="checkbox checkbox-secondary"
+                      className="checkbox checkbox-accent"
                       checked={allowChangeVote}
                       onChange={(e) => setAllowChangeVote(e.target.checked)}
                       disabled={isLoading}

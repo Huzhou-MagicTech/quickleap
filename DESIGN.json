@@ -1,0 +1,127 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-04-30T00:00:00.000Z",
+  "title": "Design System: QuickLeap",
+  "extensions": {
+    "colorMeta": {
+      "primary": { "role": "primary", "displayName": "Sea Glass Teal", "canonical": "oklch(72% 0.14 178)", "tonalRamp": ["oklch(15% 0.14 178)", "oklch(25% 0.14 178)", "oklch(35% 0.14 178)", "oklch(45% 0.14 178)", "oklch(55% 0.14 178)", "oklch(72% 0.14 178)", "oklch(82% 0.12 178)", "oklch(95% 0.04 178)"] },
+      "primary-deep": { "role": "primary-variant", "displayName": "Deep Teal", "canonical": "oklch(35% 0.08 160)", "tonalRamp": ["oklch(15% 0.08 160)", "oklch(25% 0.08 160)", "oklch(35% 0.08 160)", "oklch(45% 0.08 160)", "oklch(55% 0.08 160)", "oklch(65% 0.06 160)", "oklch(82% 0.04 160)", "oklch(95% 0.02 160)"] },
+      "primary-light": { "role": "accent", "displayName": "Light Teal", "canonical": "oklch(78% 0.12 175)", "tonalRamp": ["oklch(20% 0.12 175)", "oklch(35% 0.12 175)", "oklch(50% 0.12 175)", "oklch(60% 0.12 175)", "oklch(70% 0.12 175)", "oklch(78% 0.12 175)", "oklch(87% 0.08 175)", "oklch(96% 0.04 175)"] },
+      "sea-ink": { "role": "neutral-text", "displayName": "Sea Ink", "canonical": "oklch(30% 0.05 180)", "tonalRamp": ["oklch(15% 0.05 180)", "oklch(22% 0.05 180)", "oklch(30% 0.05 180)", "oklch(40% 0.05 180)", "oklch(55% 0.04 180)", "oklch(70% 0.03 180)", "oklch(85% 0.02 180)", "oklch(96% 0.01 180)"] },
+      "sea-ink-soft": { "role": "neutral-text-secondary", "displayName": "Sea Ink Soft", "canonical": "oklch(45% 0.04 175)", "tonalRamp": ["oklch(20% 0.04 175)", "oklch(30% 0.04 175)", "oklch(45% 0.04 175)", "oklch(55% 0.03 175)", "oklch(65% 0.03 175)", "oklch(75% 0.03 175)", "oklch(85% 0.02 175)", "oklch(95% 0.01 175)"] },
+      "header-bg": { "role": "neutral-bg", "displayName": "Header Background", "canonical": "oklch(98% 0.005 175)", "tonalRamp": ["oklch(85% 0.005 175)", "oklch(90% 0.005 175)", "oklch(93% 0.005 175)", "oklch(95% 0.005 175)", "oklch(97% 0.005 175)", "oklch(98% 0.005 175)", "oklch(99% 0.003 175)", "oklch(99.5% 0.002 175)"] },
+      "chip-bg": { "role": "neutral-bg", "displayName": "Chip Background", "canonical": "oklch(96% 0.008 175)", "tonalRamp": ["oklch(80% 0.008 175)", "oklch(85% 0.008 175)", "oklch(90% 0.008 175)", "oklch(93% 0.008 175)", "oklch(95% 0.008 175)", "oklch(96% 0.008 175)", "oklch(98% 0.005 175)", "oklch(99% 0.003 175)"] },
+      "chip-line": { "role": "neutral-border", "displayName": "Chip Line", "canonical": "oklch(85% 0.04 175)", "tonalRamp": ["oklch(70% 0.04 175)", "oklch(75% 0.04 175)", "oklch(80% 0.04 175)", "oklch(82% 0.04 175)", "oklch(85% 0.04 175)", "oklch(88% 0.035 175)", "oklch(92% 0.03 175)", "oklch(96% 0.02 175)"] },
+      "link-bg-hover": { "role": "neutral-hover", "displayName": "Link Hover Background", "canonical": "oklch(92% 0.02 175)", "tonalRamp": ["oklch(75% 0.02 175)", "oklch(80% 0.02 175)", "oklch(85% 0.02 175)", "oklch(88% 0.02 175)", "oklch(90% 0.02 175)", "oklch(92% 0.02 175)", "oklch(95% 0.015 175)", "oklch(98% 0.01 175)"] },
+      "line": { "role": "neutral-border", "displayName": "Line", "canonical": "oklch(88% 0.02 175)", "tonalRamp": ["oklch(75% 0.02 175)", "oklch(80% 0.02 175)", "oklch(82% 0.02 175)", "oklch(85% 0.02 175)", "oklch(88% 0.02 175)", "oklch(91% 0.018 175)", "oklch(95% 0.01 175)", "oklch(98% 0.005 175)"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Hero headlines, page titles only. Fraunces 700." },
+      "headline": { "displayName": "Headline", "purpose": "Section headers, card titles. Fraunces 500." },
+      "title": { "displayName": "Title", "purpose": "Component titles, modal headers. Manrope 700." },
+      "body": { "displayName": "Body", "purpose": "Default body text. Manrope 400, capped at 70ch." },
+      "label": { "displayName": "Label", "purpose": "Buttons, nav items, form labels. Manrope 600." }
+    },
+    "shadows": [
+      { "name": "ambient-low", "value": "0 8px 24px rgba(30,90,72,0.08)", "purpose": "Card rest state, chip elements. Diffuse teal-tinted shadow." },
+      { "name": "ambient-medium", "value": "0 8px 22px rgba(30,90,72,0.12)", "purpose": "Hover states, interactive elements. Slightly stronger teal tint." }
+    ],
+    "motion": [
+      { "name": "ease-out-quart", "value": "cubic-bezier(0.25, 1, 0.5, 1)", "purpose": "Default easing for state transitions. Exponential ease-out." },
+      { "name": "hover-lift", "value": "translateY(-0.5px)", "purpose": "Subtle upward translation on hover for interactive elements." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Primary actions like Create, Join, Vote. Sea Glass Teal background with white text.",
+      "html": "<button class=\"ds-btn-primary\">Go!</button>",
+      "css": ".ds-btn-primary { background: #4fb8b2; color: #ffffff; font-family: Manrope, system-ui, sans-serif; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.01em; padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: background 0.2s ease, transform 0.2s ease; } .ds-btn-primary:hover { background: #1e5a48; transform: translateY(-0.5px); } .ds-btn-primary:focus-visible { outline: 2px solid #4fb8b2; outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary actions like Cancel, Back. Transparent background with hover state.",
+      "html": "<button class=\"ds-btn-ghost\">Cancel</button>",
+      "css": ".ds-btn-ghost { background: transparent; color: oklch(30% 0.05 180); font-family: Manrope, system-ui, sans-serif; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.01em; padding: 0.5rem 1.5rem; border-radius: 0.5rem; border: none; cursor: pointer; transition: background 0.2s ease; } .ds-btn-ghost:hover { background: oklch(92% 0.02 175); } .ds-btn-ghost:focus-visible { outline: 2px solid oklch(30% 0.05 180); outline-offset: 2px; }"
+    },
+    {
+      "name": "Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Container for content blocks. Flat at rest with subtle shadow, lifts on hover.",
+      "html": "<div class=\"ds-card\"><div class=\"ds-card-body\"><h3 class=\"ds-card-title\">Card Title</h3><p>Card content goes here.</p></div></div>",
+      "css": ".ds-card { background: oklch(100% 0 0); border-radius: 1rem; padding: 1.5rem; box-shadow: 0 1px 3px rgba(30,90,72,0.08); transition: box-shadow 0.2s ease, transform 0.2s ease; } .ds-card:hover { box-shadow: 0 8px 24px rgba(30,90,72,0.08); } .ds-card-body { display: flex; flex-direction: column; gap: 1rem; } .ds-card-title { font-family: Fraunces, Georgia, serif; font-weight: 500; font-size: 1.5rem; line-height: 1.3; color: oklch(30% 0.05 180); margin: 0; }"
+    },
+    {
+      "name": "Input Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Text inputs for forms. Clean with teal focus state.",
+      "html": "<input class=\"ds-input\" type=\"text\" placeholder=\"Enter text...\">",
+      "css": ".ds-input { background: oklch(100% 0 0); color: oklch(30% 0.05 180); font-family: Manrope, system-ui, sans-serif; font-size: 1rem; line-height: 1.6; padding: 0.5rem 1rem; border-radius: 0.5rem; border: 1px solid oklch(88% 0.02 175); outline: none; transition: border-color 0.2s ease; width: 100%; } .ds-input:focus { border-color: #4fb8b2; } .ds-input::placeholder { color: oklch(45% 0.04 175); } .ds-input:disabled { opacity: 0.5; cursor: not-allowed; }"
+    },
+    {
+      "name": "Nav Link",
+      "kind": "nav",
+      "refersTo": "nav-link",
+      "description": "Navigation items in header. Pill-shaped with active state.",
+      "html": "<a class=\"ds-nav-link\" href=\"#\">Home</a>",
+      "css": ".ds-nav-link { color: oklch(45% 0.04 175); font-family: Manrope, system-ui, sans-serif; font-weight: 600; font-size: 0.875rem; letter-spacing: 0.01em; padding: 0.375rem 0.75rem; border-radius: 9999px; text-decoration: none; transition: background 0.2s ease, color 0.2s ease; } .ds-nav-link:hover { background: oklch(92% 0.02 175); color: oklch(30% 0.05 180); } .ds-nav-link.is-active { background: oklch(96% 0.008 175); color: oklch(30% 0.05 180); border: 1px solid oklch(85% 0.04 175); }"
+    },
+    {
+      "name": "Chip / Tag",
+      "kind": "chip",
+      "refersTo": "chip",
+      "description": "Inline tags and badges. Used for status, categories, labels.",
+      "html": "<span class=\"ds-chip\">Tag Label</span>",
+      "css": ".ds-chip { display: inline-flex; align-items: center; gap: 0.5rem; background: oklch(96% 0.008 175); color: oklch(30% 0.05 180); font-family: Manrope, system-ui, sans-serif; font-weight: 600; font-size: 0.875rem; padding: 0.375rem 0.75rem; border-radius: 9999px; border: 1px solid oklch(85% 0.04 175); } .ds-chip.selected { background: #4fb8b2; color: #ffffff; border-color: #4fb8b2; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Quick Ledger",
+    "overview": "QuickLeap's visual system is clean, structured, and fast — like Notion's clarity compressed into decisive action. Information hierarchy guides users toward quick choices without decoration or distraction. The interface is a tool for teams to reach consensus, not a marketing surface. Every pixel earns its place by moving the user closer to a decision.\n\nThe system explicitly rejects cluttered enterprise UIs — dense dashboards, tiny text, and overwhelming data presentations that slow down decision-making. There are no neon accents, no glassmorphism, no gradient-text heroes. The design is sharp, minimal, and purpose-driven.",
+    "keyCharacteristics": [
+      "Sea-glass teal primary (oklch 65% 0.15 180) with warm-tinted neutrals",
+      "Fraunces for display headlines, Manrope for UI — serif authority, sans efficiency",
+      "Subtle elevation: flat at rest, gentle lift on interaction",
+      "Decisive by default: no friction, no noise, no dead ends"
+    ],
+    "rules": [
+      { "name": "The Decisive Accent Rule", "body": "The primary teal carries no more than 15% of any given surface. Its rarity creates visual hierarchy — when you see teal, action is required.", "section": "colors" },
+      { "name": "The Warm Neutral Rule", "body": "Every neutral tints toward the brand teal (chroma 0.005–0.02). Pure gray is forbidden — #000 and #fff never appear.", "section": "colors" },
+      { "name": "The Hierarchy Rule", "body": "Scale ratio ≥1.25 between steps. Flat scales are forbidden — if two text elements look the same size, one is wrong.", "section": "typography" },
+      { "name": "The Line Length Rule", "body": "Body text never exceeds 70ch. The reading experience is structured, not endless.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. Shadows appear only as a response to state (hover, elevation, focus).", "section": "elevation" },
+      { "name": "The Teal Tint Rule", "body": "All shadows carry the brand hue (rgba(30,90,72,...)). Neutral shadows (gray) are forbidden.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do use Sea Glass Teal sparingly — its rarity creates visual hierarchy.",
+      "Do tint every neutral toward the brand teal (chroma 0.005–0.02).",
+      "Do maintain ≥1.25 scale ratio between typography steps.",
+      "Do cap body line length at 70ch for readability.",
+      "Do keep surfaces flat at rest; add shadows only on interaction.",
+      "Do use Fraunces for \"what\" (headlines), Manrope for \"how\" (UI elements)."
+    ],
+    "donts": [
+      "Don't use side-stripe borders (border-left greater than 1px) as colored accents. Use background tints or full borders.",
+      "Don't use gradient text (background-clip: text). Use a single solid color for emphasis.",
+      "Don't use glassmorphism as decoration. Shadows are subtle and purposeful, or nothing.",
+      "Don't create identical card grids with icon + heading + text repeated endlessly. Vary the layout.",
+      "Don't use modals as a first thought. Exhaust inline / progressive alternatives first.",
+      "Don't create cluttered enterprise UIs — dense dashboards, tiny text, overwhelming data that slows decision-making.",
+      "Don't use #000 or #fff. Every neutral tints toward brand teal.",
+      "Don't use em dashes — use commas, colons, semicolons, periods, or parentheses.",
+      "Don't let AI slop happen — if someone can guess \"it looks like a voting app\" from category alone, rework the scene and color strategy."
+    ]
+  }
+}

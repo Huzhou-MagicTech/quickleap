@@ -178,3 +178,26 @@ describe("Component", () => {
 ### 投票逻辑
 - `castVote` 同时检查 session_id + chain_id 来判断是否更新现有投票
 - GET 接口返回 `hasVoted`、`userVote`、`userReason` 用于刷新恢复投票状态
+
+## Design Context
+
+QuickLeap uses the impeccable skill for design work. Key files:
+
+- **PRODUCT.md** — Strategic context: register (product), users, brand personality (fast, clear, decisive), anti-references, design principles
+- **DESIGN.md** — Visual system: Sea Glass palette (teal primary, warm-tinted neutrals), Fraunces + Manrope typography, component specs, do's/don'ts
+- **DESIGN.json** — Machine-readable sidecar with tonal ramps, shadow tokens, component HTML/CSS snippets
+
+**Register:** product (app UI serving teams making decisions)
+
+**Design Principles:**
+1. Decisive by default — every interaction moves users toward a decision
+2. Structured clarity — clear hierarchy like Notion
+3. Speed over delight — animations only when they accelerate understanding
+4. Opinionated simplicity — strong defaults, minimal configuration
+
+**Key Rules:**
+- No pure #000 or #fff — every neutral tints toward brand teal (chroma 0.005–0.02)
+- Primary teal ≤15% of any surface (The Decisive Accent Rule)
+- Typography scale ratio ≥1.25 between steps
+- Body text capped at 70ch
+- Flat at rest, shadows only on interaction
