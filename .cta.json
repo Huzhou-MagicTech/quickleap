@@ -1,5 +1,5 @@
 {
-  "projectName": "quickjump",
+  "projectName": "quickleap",
   "mode": "file-router",
   "typescript": true,
   "packageManager": "pnpm",
@@ -11,7 +11,5 @@
   "routerOnly": false,
   "version": 1,
   "framework": "react",
-  "chosenAddOns": [
-    "eslint"
-  ]
+  "chosenAddOns": ["eslint"]
 }

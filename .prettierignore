@@ -1,3 +1,4 @@
+.gitignore
 node_modules
 .DS_Store
 dist
@@ -11,4 +12,5 @@ dist-ssr
 .vinxi
 __unconfig*
 todos.json
+.agents
 routeTree.gen.ts

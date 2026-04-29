@@ -41,7 +41,7 @@ user-invocable: true
   <div className="card-body">
     <h2 className="card-title">Title</h2>
     <p>Content</p>
-    <div className="justify-end card-actions">
+    <div className="card-actions justify-end">
       <button className="btn btn-primary">Action</button>
     </div>
   </div>
@@ -63,7 +63,7 @@ user-invocable: true
   <label className="label">
     <span className="label-text">Label</span>
   </label>
-  <input type="text" className="input input-bordered" />
+  <input type="text" className="input-bordered input" />
   <label className="label">
     <span className="label-text-alt">Helper text</span>
   </label>

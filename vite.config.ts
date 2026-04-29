@@ -8,13 +8,14 @@ import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 const config = defineConfig({
-  plugins: [
-    devtools(),
-    tsconfigPaths({ projects: ["./tsconfig.json"] }),
-    tailwindcss(),
-    tanstackStart(),
-    viteReact(),
-  ],
+  plugins: [devtools(), tsconfigPaths({ projects: ["./tsconfig.json"] }), tailwindcss(), tanstackStart(), viteReact()],
+  server: {
+    allowedHosts: [
+      // 测试用 ngrok 中转
+      "viviana-nonhedonistic-vestigially.ngrok-free.dev",
+      ".ngrok-free.dev",
+    ],
+  },
 });
 
 export default config;
