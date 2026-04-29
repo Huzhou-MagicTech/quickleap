@@ -12,7 +12,9 @@
     "test": "vitest run",
     "lint": "eslint",
     "format": "prettier --check .",
-    "check": "prettier --write . && eslint --fix"
+    "check": "prettier --write . && eslint --fix",
+    "db:init": "node scripts/init-db.js",
+    "db:reset": "rm -f quickleap.db && node scripts/init-db.js"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
