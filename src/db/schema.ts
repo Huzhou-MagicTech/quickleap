@@ -11,6 +11,9 @@ export const chains = sqliteTable("chains", {
   expires_at: text("expires_at"),
   created_at: text("created_at").notNull(),
   closed_at: text("closed_at"),
+  vote_options: text("vote_options").notNull().default('["通过","不通过"]'),
+  reason_required: text("reason_required").notNull().default("false"),
+  allow_change_vote: text("allow_change_vote").notNull().default("true"),
 });
 
 export const participants = sqliteTable("participants", {
@@ -49,11 +52,14 @@ export interface CreateChainInput {
   description?: string;
   attachments?: string[];
   expiresAt?: string;
+  voteOptions?: [string, string];
+  reasonRequired?: boolean;
+  allowChangeVote?: boolean;
 }
 
 export interface CastVoteInput {
   chain_id: string;
-  vote: "approve" | "reject";
+  vote: string;
   reason?: string;
   ip_address: string;
   session_id: string;
@@ -63,4 +69,9 @@ export interface VoteStats {
   approves: number;
   rejects: number;
   total: number;
+}
+
+export interface VoteOptions {
+  approve: string;
+  reject: string;
 }

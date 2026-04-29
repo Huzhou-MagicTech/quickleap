@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getChainByShareKey, castVote } from "#/server/chains";
+import { getChainByShareKey, joinChain, castVote } from "#/server/chains";
 
 export const Route = createFileRoute("/api/chains/$shareKey/vote/")({
   server: {
@@ -7,14 +7,10 @@ export const Route = createFileRoute("/api/chains/$shareKey/vote/")({
       POST: async ({ params, request }) => {
         try {
           const body = await request.json();
-          const { vote, reason } = body as { vote: "approve" | "reject"; reason?: string };
+          const { voteIndex, reason } = body as { voteIndex: number; reason?: string };
 
-          if (!vote || !["approve", "reject"].includes(vote)) {
+          if (voteIndex !== 0 && voteIndex !== 1) {
             return Response.json({ error: "无效的投票选项" }, { status: 400 });
-          }
-
-          if (vote === "reject" && (!reason || reason.trim().length === 0)) {
-            return Response.json({ error: "不通过必须填写理由" }, { status: 400 });
           }
 
           const chainResult = await getChainByShareKey((params as any).shareKey);
@@ -26,30 +22,49 @@ export const Route = createFileRoute("/api/chains/$shareKey/vote/")({
             return Response.json({ error: "投票已截止" }, { status: 400 });
           }
 
-          const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-          const sessionId = request.headers.get("x-session-id");
+          // 检查 reason_required 设置
+          if (chainResult.chain.reason_required === "true" && (!reason || reason.trim().length === 0)) {
+            return Response.json({ error: "请填写投票理由" }, { status: 400 });
+          }
 
-          if (!sessionId) {
-            return Response.json({ error: "请先加入讨论串" }, { status: 401 });
+          const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
+          // 使用客户端传入的 sessionId，如果没有则生成新的
+          const clientSessionId = request.headers.get("x-session-id");
+          const sessionId = clientSessionId || crypto.randomUUID();
+
+          // 每次投票都加入讨论串（为当前讨论串创建新参与者）
+          try {
+            const joinResult = await joinChain(chainResult.chain.id, undefined, ipAddress ?? "", sessionId);
+          } catch (e) {
+            console.error("[API castVote] joinChain error:", e);
           }
 
           const result = await castVote({
             chain_id: chainResult.chain.id,
-            vote,
+            vote: voteIndex === 0 ? "option_0" : "option_1",
             reason,
             ip_address: ipAddress ?? "",
             session_id: sessionId,
           });
 
-          return Response.json({
-            vote: {
-              id: result.vote.id,
-              vote: result.vote.vote,
-              reason: result.vote.reason,
-              createdAt: result.vote.created_at,
+
+          return Response.json(
+            {
+              vote: {
+                id: result.vote.id,
+                vote: result.vote.vote,
+                reason: result.vote.reason,
+                createdAt: result.vote.created_at,
+              },
+              sessionId: sessionId,
+              message: result.isNew ? "投票成功" : "投票已更新",
             },
-            message: result.isNew ? "投票成功" : "投票已更新",
-          });
+            {
+              headers: {
+                "Set-Cookie": `session_id=${sessionId}; Path=/; HttpOnly; SameSite=Lax`,
+              },
+            },
+          );
         } catch (err) {
           console.error("[API] castVote error:", err);
           return Response.json({ error: "投票失败" }, { status: 500 });

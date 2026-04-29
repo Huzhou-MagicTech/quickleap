@@ -14,6 +14,7 @@ import { Route as ChainsNewRouteImport } from './routes/chains/new'
 import { Route as ChainsChainIdRouteImport } from './routes/chains/$chainId'
 import { Route as ApiChainsIndexRouteImport } from './routes/api/chains/index'
 import { Route as ApiChainsShareKeyIndexRouteImport } from './routes/api/chains/$shareKey/index'
+import { Route as ApiChainsChainIdIndexRouteImport } from './routes/api/chains/$chainId/index'
 import { Route as ApiChainsShareKeyVoteIndexRouteImport } from './routes/api/chains/$shareKey/vote/index'
 import { Route as ApiChainsShareKeyResultsIndexRouteImport } from './routes/api/chains/$shareKey/results/index'
 
@@ -42,6 +43,11 @@ const ApiChainsShareKeyIndexRoute = ApiChainsShareKeyIndexRouteImport.update({
   path: '/api/chains/$shareKey/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiChainsChainIdIndexRoute = ApiChainsChainIdIndexRouteImport.update({
+  id: '/api/chains/$chainId/',
+  path: '/api/chains/$chainId/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChainsShareKeyVoteIndexRoute =
   ApiChainsShareKeyVoteIndexRouteImport.update({
     id: '/api/chains/$shareKey/vote/',
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/chains/$chainId': typeof ChainsChainIdRoute
   '/chains/new': typeof ChainsNewRoute
   '/api/chains/': typeof ApiChainsIndexRoute
+  '/api/chains/$chainId/': typeof ApiChainsChainIdIndexRoute
   '/api/chains/$shareKey/': typeof ApiChainsShareKeyIndexRoute
   '/api/chains/$shareKey/results/': typeof ApiChainsShareKeyResultsIndexRoute
   '/api/chains/$shareKey/vote/': typeof ApiChainsShareKeyVoteIndexRoute
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/chains/$chainId': typeof ChainsChainIdRoute
   '/chains/new': typeof ChainsNewRoute
   '/api/chains': typeof ApiChainsIndexRoute
+  '/api/chains/$chainId': typeof ApiChainsChainIdIndexRoute
   '/api/chains/$shareKey': typeof ApiChainsShareKeyIndexRoute
   '/api/chains/$shareKey/results': typeof ApiChainsShareKeyResultsIndexRoute
   '/api/chains/$shareKey/vote': typeof ApiChainsShareKeyVoteIndexRoute
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/chains/$chainId': typeof ChainsChainIdRoute
   '/chains/new': typeof ChainsNewRoute
   '/api/chains/': typeof ApiChainsIndexRoute
+  '/api/chains/$chainId/': typeof ApiChainsChainIdIndexRoute
   '/api/chains/$shareKey/': typeof ApiChainsShareKeyIndexRoute
   '/api/chains/$shareKey/results/': typeof ApiChainsShareKeyResultsIndexRoute
   '/api/chains/$shareKey/vote/': typeof ApiChainsShareKeyVoteIndexRoute
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/chains/$chainId'
     | '/chains/new'
     | '/api/chains/'
+    | '/api/chains/$chainId/'
     | '/api/chains/$shareKey/'
     | '/api/chains/$shareKey/results/'
     | '/api/chains/$shareKey/vote/'
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/chains/$chainId'
     | '/chains/new'
     | '/api/chains'
+    | '/api/chains/$chainId'
     | '/api/chains/$shareKey'
     | '/api/chains/$shareKey/results'
     | '/api/chains/$shareKey/vote'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/chains/$chainId'
     | '/chains/new'
     | '/api/chains/'
+    | '/api/chains/$chainId/'
     | '/api/chains/$shareKey/'
     | '/api/chains/$shareKey/results/'
     | '/api/chains/$shareKey/vote/'
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   ChainsChainIdRoute: typeof ChainsChainIdRoute
   ChainsNewRoute: typeof ChainsNewRoute
   ApiChainsIndexRoute: typeof ApiChainsIndexRoute
+  ApiChainsChainIdIndexRoute: typeof ApiChainsChainIdIndexRoute
   ApiChainsShareKeyIndexRoute: typeof ApiChainsShareKeyIndexRoute
   ApiChainsShareKeyResultsIndexRoute: typeof ApiChainsShareKeyResultsIndexRoute
   ApiChainsShareKeyVoteIndexRoute: typeof ApiChainsShareKeyVoteIndexRoute
@@ -160,6 +173,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChainsShareKeyIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/chains/$chainId/': {
+      id: '/api/chains/$chainId/'
+      path: '/api/chains/$chainId'
+      fullPath: '/api/chains/$chainId/'
+      preLoaderRoute: typeof ApiChainsChainIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/chains/$shareKey/vote/': {
       id: '/api/chains/$shareKey/vote/'
       path: '/api/chains/$shareKey/vote'
@@ -182,6 +202,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChainsChainIdRoute: ChainsChainIdRoute,
   ChainsNewRoute: ChainsNewRoute,
   ApiChainsIndexRoute: ApiChainsIndexRoute,
+  ApiChainsChainIdIndexRoute: ApiChainsChainIdIndexRoute,
   ApiChainsShareKeyIndexRoute: ApiChainsShareKeyIndexRoute,
   ApiChainsShareKeyResultsIndexRoute: ApiChainsShareKeyResultsIndexRoute,
   ApiChainsShareKeyVoteIndexRoute: ApiChainsShareKeyVoteIndexRoute,

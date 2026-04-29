@@ -2,13 +2,20 @@ import { db, schema } from "#/db";
 import { eq, and, sql } from "drizzle-orm";
 import type { CreateChainInput, CastVoteInput, VoteStats } from "#/db/schema";
 
+const SHARE_KEY_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const SEGMENT_LENGTH = 4;
+const SEGMENT_COUNT = 4;
+
 function generateShareKey(): string {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let key = "";
-  for (let i = 0; i < 6; i++) {
-    key += chars.charAt(Math.floor(Math.random() * chars.length));
+  const segments = [];
+  for (let i = 0; i < SEGMENT_COUNT; i++) {
+    let segment = "";
+    for (let j = 0; j < SEGMENT_LENGTH; j++) {
+      segment += SHARE_KEY_CHARS[Math.floor(Math.random() * SHARE_KEY_CHARS.length)];
+    }
+    segments.push(segment);
   }
-  return key;
+  return segments.join("-");
 }
 
 function generateId(): string {
@@ -31,6 +38,7 @@ export async function createChain(input: CreateChainInput, creatorIp: string | n
   }
 
   const now = new Date().toISOString();
+  const voteOptions = input.voteOptions ? JSON.stringify(input.voteOptions) : '["通过","不通过"]';
   const chain = {
     id,
     share_key: shareKey,
@@ -42,11 +50,44 @@ export async function createChain(input: CreateChainInput, creatorIp: string | n
     expires_at: input.expiresAt ?? null,
     created_at: now,
     closed_at: null,
+    vote_options: voteOptions,
+    reason_required: input.reasonRequired ? "true" : "false",
+    allow_change_vote: input.allowChangeVote === false ? "false" : "true",
   };
 
   db.insert(schema.chains).values(chain).run();
 
   return chain;
+}
+
+export async function getChainById(
+  chainId: string,
+): Promise<{ chain: schema.ChainRow; participantCount: number; voteStats: VoteStats; isExpired: boolean } | null> {
+  const chain = db.select().from(schema.chains).where(eq(schema.chains.id, chainId)).get();
+
+  if (!chain) return null;
+
+  const participantCount =
+    db
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.participants)
+      .where(eq(schema.participants.chain_id, chain.id))
+      .get()?.count ?? 0;
+
+  const votes = db.select().from(schema.votes).where(eq(schema.votes.chain_id, chain.id)).all();
+
+  const voteStats: VoteStats = {
+    approves: votes.filter((v) => v.vote === "option_0" || v.vote === "approve").length,
+    rejects: votes.filter((v) => v.vote === "option_1" || v.vote === "reject").length,
+    total: votes.length,
+  };
+
+  return {
+    chain,
+    participantCount,
+    voteStats,
+    isExpired: isChainExpired(chain.expires_at),
+  };
 }
 
 export async function getChainByShareKey(
@@ -66,8 +107,8 @@ export async function getChainByShareKey(
   const votes = db.select().from(schema.votes).where(eq(schema.votes.chain_id, chain.id)).all();
 
   const voteStats: VoteStats = {
-    approves: votes.filter((v) => v.vote === "approve").length,
-    rejects: votes.filter((v) => v.vote === "reject").length,
+    approves: votes.filter((v) => v.vote === "option_0" || v.vote === "approve").length,
+    rejects: votes.filter((v) => v.vote === "option_1" || v.vote === "reject").length,
     total: votes.length,
   };
 
@@ -85,11 +126,14 @@ export async function joinChain(
   ipAddress: string,
   sessionId: string,
 ): Promise<{ participant: schema.ParticipantRow; hasVoted: boolean }> {
+  
+
   const existing = db
     .select()
     .from(schema.participants)
     .where(and(eq(schema.participants.chain_id, chainId), eq(schema.participants.session_id, sessionId)))
     .get();
+
 
   if (existing) {
     const hasVoted = !!db.select().from(schema.votes).where(eq(schema.votes.session_id, sessionId)).get();
@@ -110,12 +154,18 @@ export async function joinChain(
   };
 
   db.insert(schema.participants).values(participant).run();
+  
 
   return { participant, hasVoted: false };
 }
 
 export async function castVote(input: CastVoteInput): Promise<{ vote: schema.VoteRow; isNew: boolean }> {
-  const existing = db.select().from(schema.votes).where(eq(schema.votes.session_id, input.session_id)).get();
+
+  const existing = db
+    .select()
+    .from(schema.votes)
+    .where(and(eq(schema.votes.session_id, input.session_id), eq(schema.votes.chain_id, input.chain_id)))
+    .get();
 
   const now = new Date().toISOString();
 
@@ -129,6 +179,7 @@ export async function castVote(input: CastVoteInput): Promise<{ vote: schema.Vot
       })
       .where(eq(schema.votes.id, existing.id))
       .run();
+
 
     return { vote: { ...existing, vote: input.vote, reason: input.reason ?? null, updated_at: now }, isNew: false };
   }
@@ -168,8 +219,8 @@ export async function getVoteStats(chainId: string): Promise<{ stats: VoteStats;
 
   return {
     stats: {
-      approves: votes.filter((v) => v.vote === "approve").length,
-      rejects: votes.filter((v) => v.vote === "reject").length,
+      approves: votes.filter((v) => v.vote === "option_0" || v.vote === "approve").length,
+      rejects: votes.filter((v) => v.vote === "option_1").length,
       total: votes.length,
     },
     status: chain.status as "active" | "closed",

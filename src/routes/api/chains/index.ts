@@ -27,8 +27,21 @@ export const Route = createFileRoute("/api/chains/")({
             }
           }
 
+          if (body.voteOptions) {
+            if (!Array.isArray(body.voteOptions) || body.voteOptions.length !== 2) {
+              return Response.json({ error: "投票选项必须是包含两个元素的数组" }, { status: 400 });
+            }
+            if (!body.voteOptions[0]?.trim() || !body.voteOptions[1]?.trim()) {
+              return Response.json({ error: "投票选项不能为空" }, { status: 400 });
+            }
+          }
+
           const creatorIp = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
           const chain = await createChain(body, creatorIp);
+
+          const voteOptions = chain.vote_options ? JSON.parse(chain.vote_options) : ["通过", "不通过"];
+          const reasonRequired = chain.reason_required === "true";
+          const allowChangeVote = chain.allow_change_vote !== "false";
 
           return Response.json(
             {
@@ -41,6 +54,9 @@ export const Route = createFileRoute("/api/chains/")({
                 status: chain.status,
                 expiresAt: chain.expires_at,
                 createdAt: chain.created_at,
+                voteOptions,
+                reasonRequired,
+                allowChangeVote,
               },
               message: "讨论串创建成功",
             },

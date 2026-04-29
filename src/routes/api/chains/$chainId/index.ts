@@ -1,12 +1,16 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getChainByShareKey, joinChain, getVoteBySession } from "#/server/chains";
+import { getChainById, getVoteBySession } from "#/server/chains";
+import { initializeDatabase } from "#/db";
 
-export const Route = createFileRoute("/api/chains/$shareKey/")({
+initializeDatabase();
+
+export const Route = createFileRoute("/api/chains/$chainId/")({
   server: {
     handlers: {
       GET: async ({ params, request }) => {
         try {
-          const result = await getChainByShareKey((params as any).shareKey);
+          const { chainId } = params as { chainId: string };
+          const result = await getChainById(chainId);
 
           if (!result) {
             return Response.json({ error: "讨论串不存在" }, { status: 404 });
@@ -54,45 +58,6 @@ export const Route = createFileRoute("/api/chains/$shareKey/")({
         } catch (err) {
           console.error("[API] getChain error:", err);
           return Response.json({ error: "获取失败" }, { status: 500 });
-        }
-      },
-      POST: async ({ params, request }) => {
-        try {
-          const body = await request.json();
-          const { displayName } = body as { displayName?: string };
-
-          const chainResult = await getChainByShareKey((params as any).shareKey);
-          if (!chainResult) {
-            return Response.json({ error: "讨论串不存在" }, { status: 404 });
-          }
-
-          if (chainResult.isExpired && chainResult.chain.status === "active") {
-            return Response.json({ error: "投票已截止" }, { status: 400 });
-          }
-
-          const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? null;
-          const sessionId = request.headers.get("x-session-id") ?? crypto.randomUUID();
-
-          const result = await joinChain(chainResult.chain.id, displayName, ipAddress ?? "", sessionId);
-
-          return Response.json(
-            {
-              participant: {
-                id: result.participant.id,
-                displayName: result.participant.display_name,
-              },
-              sessionId,
-              hasVoted: result.hasVoted,
-            },
-            {
-              headers: {
-                "Set-Cookie": `session_id=${sessionId}; Path=/; HttpOnly; SameSite=Lax`,
-              },
-            },
-          );
-        } catch (err) {
-          console.error("[API] joinChain error:", err);
-          return Response.json({ error: "加入失败" }, { status: 500 });
         }
       },
     },

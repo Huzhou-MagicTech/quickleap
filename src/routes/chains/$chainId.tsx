@@ -1,32 +1,47 @@
-import { getChain, joinChain, castVote, getVoteStats } from "#/server/client";
+import { getChain, castVote, getVoteStats } from "#/server/client";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { ArrowLeftIcon, CheckIcon, XIcon } from "lucide-react";
+import { ArrowLeftIcon, CheckIcon, ClipboardIcon, EditIcon, XIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/chains/$chainId")({
   component: RouteComponent,
 });
 
+/**
+ * 讨论串详情页面
+ * 显示讨论串信息、投票结果，并提供投票功能
+ */
 function RouteComponent() {
   const navigate = useNavigate();
   const { chainId } = Route.useParams();
 
+  // 讨论串数据
   const [chainData, setChainData] = useState<Awaited<ReturnType<typeof getChain>> | null>(null);
+  // 投票统计数据
   const [statsData, setStatsData] = useState<Awaited<ReturnType<typeof getVoteStats>> | null>(null);
+  // 加载状态
   const [isLoading, setIsLoading] = useState(true);
+  // 全局错误（如加载失败）
   const [error, setError] = useState<string>("");
 
-  const [displayName, setDisplayName] = useState("");
-  const [hasJoined, setHasJoined] = useState(false);
-  const [currentVote, setCurrentVote] = useState<"approve" | "reject" | null>(null);
-  const [reason, setReason] = useState("");
-  const [isVoting, setIsVoting] = useState(false);
-  const [voteError, setVoteError] = useState("");
+  // 当前用户投票相关状态
+  const [currentVote, setCurrentVote] = useState<number | null>(null); // 当前用户的投票选项索引
+  const [savedReason, setSavedReason] = useState(""); // 保存的理由（用于取消时恢复）
+  const [reason, setReason] = useState(""); // 当前输入的理由
+  const [reasonError, setReasonError] = useState(false); // 理由填写错误
+  const [voteError, setVoteError] = useState<string | null>(null); // 投票提交错误
+  const [isVoting, setIsVoting] = useState(false); // 投票中状态
+  const [isEditing, setIsEditing] = useState(false); // 是否在改票模式
 
+  // 复制功能状态
+  const [copied, setCopied] = useState(false);
+
+  // 页面加载时获取数据
   useEffect(() => {
     loadChainData();
   }, [chainId]);
 
+  // 加载讨论串数据和投票统计
   const loadChainData = async () => {
     setIsLoading(true);
     setError("");
@@ -35,6 +50,14 @@ function RouteComponent() {
       const [chain, stats] = await Promise.all([getChain(chainId), getVoteStats(chainId)]);
       setChainData(chain);
       setStatsData(stats);
+
+      // 如果已投票，恢复投票状态
+      if (chain.hasVoted && chain.userVote !== null) {
+        const voteIndex = chain.userVote === "option_0" ? 0 : 1;
+        setCurrentVote(voteIndex);
+        setSavedReason(chain.userReason || "");
+        setReason(chain.userReason || "");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "加载失败");
     } finally {
@@ -42,53 +65,59 @@ function RouteComponent() {
     }
   };
 
-  const handleJoin = async () => {
-    if (hasJoined) return;
+  // 提交投票
+  const handleVote = async (voteIndex: number) => {
+    setReasonError(false);
 
-    try {
-      const result = await joinChain(chainId, displayName || undefined);
-      setHasJoined(true);
-      if (result.hasVoted) {
-        loadChainData();
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "加入失败");
-    }
-  };
-
-  const handleVote = async (vote: "approve" | "reject") => {
-    setCurrentVote(vote);
-    setVoteError("");
-
-    if (vote === "reject" && !reason.trim()) {
-      setVoteError("不通过必须填写理由");
+    // 检查是否需要填写理由
+    if (chain.reasonRequired && !reason.trim()) {
+      setReasonError(true);
       return;
     }
 
     setIsVoting(true);
 
     try {
-      await castVote(chainId, vote, reason || undefined);
+      await castVote(chainId, voteIndex, reason || undefined);
+      setCurrentVote(voteIndex);
+      setSavedReason(reason); // 保存理由
+      setIsEditing(false);
       await loadChainData();
     } catch (err) {
+      console.error("[handleVote] Error:", err);
       setVoteError(err instanceof Error ? err.message : "投票失败");
     } finally {
       setIsVoting(false);
     }
   };
 
+  // 复制分享码到剪贴板
+  const handleCopyShareKey = async () => {
+    if (!chainData) return;
+
+    try {
+      await navigator.clipboard.writeText(chainData.chain.shareKey);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      console.error("[Copy]", err);
+    }
+  };
+
+  // 加载中显示
   if (isLoading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <span className="loading loading-spinner loading-lg" />
+      <main className="flex min-h-screen items-center justify-center">
+        <span className="loading loading-lg loading-spinner" />
       </main>
     );
   }
 
+  // 错误或数据不存在时显示错误页面
   if (error || !chainData) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="card bg-base-100 card-md shadow-sm">
+      <main className="flex min-h-screen items-center justify-center">
+        <div className="card bg-base-100 shadow-sm card-md">
           <div className="card-body items-center text-center">
             <h2 className="card-title text-error">出错了</h2>
             <p>{error || "讨论串不存在"}</p>
@@ -104,23 +133,32 @@ function RouteComponent() {
   }
 
   const { chain } = chainData;
+  const voteOptions = chain.voteOptions || ["通过", "不通过"];
+  // 检查讨论串是否已截止
   const isExpired = chainData.isExpired || chain.status === "closed";
+  // 用户是否已投票
+  const hasVoted = currentVote !== null;
 
   return (
     <main className="min-h-screen p-4">
-      <div className="max-w-2xl mx-auto">
-        <button className="btn btn-ghost btn-sm -ml-2 mb-4" onClick={() => navigate({ to: "/" })}>
+      <div className="mx-auto max-w-2xl">
+        {/* 返回按钮 */}
+        <button className="btn mb-4 -ml-2 btn-ghost btn-sm" onClick={() => navigate({ to: "/" })}>
           <ArrowLeftIcon className="h-4 w-4" />
           返回
         </button>
 
-        <div className="card bg-base-100 card-md shadow-sm mb-4">
+        {/* 讨论串信息卡片 */}
+        <div className="card mb-4 bg-base-100 shadow-sm card-md">
           <div className="card-body">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="card-title">{chain.title}</h2>
-                <p className="text-sm text-base-content/60">
+                <p className="flex items-center gap-2 text-sm text-base-content/60">
                   分享码: <span className="font-mono font-bold">{chain.shareKey}</span>
+                  <button className={`btn btn-ghost btn-xs ${copied ? "text-success btn-success" : ""}`} onClick={handleCopyShareKey}>
+                    {copied ? <CheckIcon className="h-3 w-3" /> : <ClipboardIcon className="h-3 w-3" />}
+                  </button>
                 </p>
               </div>
               {isExpired && <div className="badge badge-error">已截止</div>}
@@ -130,104 +168,148 @@ function RouteComponent() {
 
             <div className="divider" />
 
+            {/* 参与者数量和投票统计 */}
             <div className="flex items-center justify-between text-sm">
               <span className="text-base-content/60">{chainData.participantCount} 位参与者</span>
               {statsData && (
                 <div className="flex gap-4">
-                  <span className="text-success">{statsData.stats.approves} 通过</span>
-                  <span className="text-error">{statsData.stats.rejects} 不通过</span>
+                  <span className="text-success">
+                    {statsData.stats.approves} {voteOptions[0]}
+                  </span>
+                  <span className="text-error">
+                    {statsData.stats.rejects} {voteOptions[1]}
+                  </span>
                 </div>
               )}
             </div>
           </div>
         </div>
 
+        {/* 投票结果图表 */}
         {statsData && statsData.stats.total > 0 && (
-          <div className="card bg-base-100 card-md shadow-sm mb-4">
+          <div className="card mb-4 bg-base-100 shadow-sm card-md">
             <div className="card-body">
-              <h3 className="font-semibold mb-3">投票结果</h3>
-              <div className="w-full bg-base-300 rounded-full h-4">
+              <h3 className="mb-3 font-semibold">投票结果</h3>
+              <div className="h-4 w-full rounded-full bg-base-300">
                 <div
-                  className="bg-success h-4 rounded-full transition-all"
+                  className="h-4 rounded-full bg-success transition-all duration-300"
                   style={{
                     width: `${(statsData.stats.approves / statsData.stats.total) * 100}%`,
                   }}
                 />
               </div>
-              <div className="flex justify-between text-sm mt-2">
-                <span className="text-success">通过 {((statsData.stats.approves / statsData.stats.total) * 100).toFixed(0)}%</span>
-                <span className="text-error">不通过 {((statsData.stats.rejects / statsData.stats.total) * 100).toFixed(0)}%</span>
+              <div className="mt-2 flex justify-between text-sm">
+                <span className="text-success">
+                  {voteOptions[0]} {((statsData.stats.approves / statsData.stats.total) * 100).toFixed(0)}%
+                </span>
+                <span className="text-error">
+                  {voteOptions[1]} {((statsData.stats.rejects / statsData.stats.total) * 100).toFixed(0)}%
+                </span>
               </div>
             </div>
           </div>
         )}
 
+        {/* 投票区域 */}
         {!isExpired && (
-          <div className="card bg-base-100 card-md shadow-sm">
+          <div className="card bg-base-100 shadow-sm card-md">
             <div className="card-body">
-              <h3 className="font-semibold mb-4">参与投票</h3>
+              <h3 className="mb-4 font-semibold">参与投票</h3>
 
-              {!hasJoined && (
-                <div className="form-control mb-4">
-                  <label className="label">
-                    <span className="label-text">显示名称（可选）</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="input"
-                    placeholder="输入你的名称"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    maxLength={50}
-                  />
+              {/* 显示参与者名称 */}
+              <div className="flex flex-row">
+                <label className="label">参与者：</label>
+                <p>{localStorage.getItem("quickleap_username") || "匿名"}</p>
+              </div>
+
+              {/* 已投票且不在改票模式时显示投票结果 */}
+              {hasVoted && !isEditing && (
+                <div className="mb-4 flex flex-col">
+                  <div className="flex flex-row">
+                    <label className="label">你的投票：</label>
+                    <p className={`font-semibold ${currentVote === 0 ? "text-success" : "text-error"}`}>
+                      {currentVote === 0 ? voteOptions[0] : voteOptions[1]}
+                    </p>
+                  </div>
+                  {reason && (
+                    <div className="flex flex-row">
+                      <label className="label">投票理由：</label>
+                      {reason ?? "无"}
+                    </div>
+                  )}
                 </div>
               )}
 
-              {!hasJoined && (
-                <button className="btn btn-outline w-full mb-4" onClick={handleJoin}>
-                  加入讨论
-                </button>
+              {/* 改票按钮 */}
+              {hasVoted && !isEditing && chain.allowChangeVote && (
+                <div className="text-center">
+                  <button className="btn btn-outline btn-sm" onClick={() => setIsEditing(true)}>
+                    <EditIcon className="h-4 w-4" />
+                    改票
+                  </button>
+                </div>
               )}
 
-              {hasJoined && (
+              {/* 投票表单：未投票或正在改票时显示 */}
+              {(!hasVoted || isEditing) && (
                 <>
-                  <div className="form-control mb-4">
-                    <label className="label">
-                      <span className="label-text">理由（不通过时必填）</span>
-                    </label>
+                  {/* 理由输入区域 */}
+                  <div className="form-control mb-4 flex flex-col">
+                    <div className="flex justify-between">
+                      <label className="label mb-2">
+                        <span className="label-text">理由{chain.reasonRequired && "（必填）"}</span>
+                      </label>
+                      {reasonError && <span className="text-sm text-error">请填写投票理由</span>}
+                    </div>
                     <textarea
-                      className="textarea h-20"
-                      placeholder="说明你的理由..."
+                      className={`textarea max-h-20 w-full ${reasonError ? "textarea-error" : ""}`}
+                      placeholder={`${chain.reasonRequired ? "请填写投票理由" : "说明你的理由..."}`}
                       value={reason}
-                      onChange={(e) => setReason(e.target.value)}
+                      onChange={(e) => {
+                        setReason(e.target.value);
+                        if (reasonError) setReasonError(false);
+                      }}
                       maxLength={500}
                     />
+                    {voteError && <span className="text-sm text-error">{voteError}</span>}
                   </div>
 
-                  {voteError && (
-                    <div className="alert alert-error mb-4">
-                      <span>{voteError}</span>
-                    </div>
-                  )}
-
+                  {/* 投票按钮 */}
                   <div className="flex gap-4">
-                    <button
-                      className={`btn btn-success flex-1 ${currentVote === "approve" ? "btn-outline" : ""}`}
-                      onClick={() => handleVote("approve")}
-                      disabled={isVoting}
-                    >
-                      <CheckIcon className="h-5 w-5" />
-                      通过
+                    <button className="btn flex-1 btn-success" onClick={() => handleVote(0)} disabled={isVoting}>
+                      {isVoting ? (
+                        <span className="loading loading-sm loading-spinner" />
+                      ) : (
+                        <>
+                          <CheckIcon className="h-5 w-5" />
+                          {voteOptions[0]}
+                        </>
+                      )}
                     </button>
-                    <button
-                      className={`btn btn-error flex-1 ${currentVote === "reject" ? "btn-outline" : ""}`}
-                      onClick={() => handleVote("reject")}
-                      disabled={isVoting}
-                    >
-                      <XIcon className="h-5 w-5" />
-                      不通过
+                    <button className="btn flex-1 btn-error" onClick={() => handleVote(1)} disabled={isVoting}>
+                      {isVoting ? (
+                        <span className="loading loading-sm loading-spinner" />
+                      ) : (
+                        <>
+                          <XIcon className="h-5 w-5" />
+                          {voteOptions[1]}
+                        </>
+                      )}
                     </button>
                   </div>
+
+                  {/* 取消改票按钮 */}
+                  {isEditing && chain.allowChangeVote && (
+                    <button
+                      className="btn mt-2 w-full btn-ghost btn-sm"
+                      onClick={() => {
+                        setIsEditing(false);
+                        setReason(savedReason); // 恢复之前保存的理由
+                      }}
+                    >
+                      取消
+                    </button>
+                  )}
                 </>
               )}
             </div>
